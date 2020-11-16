@@ -1,5 +1,6 @@
-import React, { useState } from 'react';
+import React, { useCallback, useState } from 'react';
 import Login from './Login';
+import OneTimePassword from './OneTimePassword';
 
 export default function App({ user }) {
   // user not logged in, show login form
@@ -7,7 +8,15 @@ export default function App({ user }) {
 
   return (
     <div>
-      Hello, {user.username}. <a href="/logout">Logout</a>
+      <p>
+        Hello, {user.username}. <a href="/logout">Logout</a>
+      </p>
+
+      {user.mfaEnabled ? (
+        <p>Confratulations, multi factor authentication is enabled.</p>
+      ) : (
+        <OneTimePassword />
+      )}
     </div>
   );
 }

@@ -11,3 +11,13 @@ export async function login(username, password) {
 
   return { user };
 }
+
+export async function verifyOtp(code) {
+  const res = await fetch('/verify_otp', {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    body: JSON.stringify({ code }),
+  });
+
+  return res.json();
+}

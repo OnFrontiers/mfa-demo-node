@@ -2,7 +2,7 @@ import React, { useCallback, useState } from 'react';
 import { login } from './api';
 import Input from './Input';
 
-export default function Login({ onLogin }) {
+export default function Login() {
   const [username, setUsername] = useState('');
   const [password, setPassword] = useState('');
   const [invalidCredentials, setInvalidCredentials] = useState(false);
