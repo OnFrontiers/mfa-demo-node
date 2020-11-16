@@ -50,6 +50,11 @@ app.post('/login', (req, res) => {
   } else if (req.user) {
     // try session login
     authenticatedUser = req.user;
+
+    // require one-time password
+    if (req.user.mfaEnabled && !req.session.mfaVerified) {
+      return res.status(403).end();
+    }
   }
 
   if (!authenticatedUser) {
@@ -73,6 +78,9 @@ app.use(function (req, res, next) {
 
 app.get('/mfa_qr_code', async (req, res) => {
   const user = req.user;
+
+  // For security, we no longer show the QR code after is verified
+  if (user.mfaEnabled) return res.status(404).end();
 
   if (!user.mfaSecret) {
     // generate unique secret for user
@@ -101,11 +109,21 @@ app.post('/verify_otp', (req, res) => {
 
   if (verifyTOTP(req.body.code, user.mfaSecret)) {
     user.mfaEnabled = true;
+    req.session.mfaVerified = true;
     setUser(user);
     res.json(true);
   } else {
     res.json(false);
   }
+});
+
+// Routes beyond this point must have MFA verified if enabled
+app.use(function (req, res, next) {
+  const user = req.user;
+  if (user && user.mfaEnabled && !req.session.mfaVerified) {
+    return res.status(403).end();
+  }
+  next();
 });
 
 // Init server

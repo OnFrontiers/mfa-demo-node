@@ -5,11 +5,16 @@ export async function login(username, password) {
     body: JSON.stringify({ username, password }),
   });
 
-  if (res.status === 401) return {};
+  if (res.status === 401) {
+    return { requireMfa: false };
+  }
+
+  if (res.status === 403) {
+    return { requireMfa: true };
+  }
 
   const user = await res.json();
-
-  return { user };
+  return { user, requireMfa: false };
 }
 
 export async function verifyOtp(code) {
